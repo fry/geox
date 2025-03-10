@@ -8,19 +8,21 @@ repository = "https://github.com/bbqsrc/geox"
 version = "0.6.0"
 
 [dependencies]
-async-graphql = {version = ">=4,<7", optional = true}
-geo = ">=0.23,<0.29"
+async-graphql = { version = "7", optional = true }
+geo = "0.29.3"
 geo-types = "0.7.8"
-geozero = {version = ">=0.9,<0.13", features = [
+geozero = { version = "0.14.0", features = [
   "with-postgis-sqlx",
-], optional = true}
-serde = {version = "1.0.144", features = ["derive"], optional = true}
-serde_json = {version = "1.0.85", optional = true}
-sqlx = {version = "0.7.4", optional = true, features = ["runtime-tokio-rustls", "postgres"]}
+], optional = true }
+serde = { version = "1.0.144", features = ["derive"], optional = true }
+serde_json = { version = "1.0.85", optional = true }
+sqlx = { version = "0.8.3", optional = true, features = [
+  "runtime-tokio-rustls",
+  "postgres",
+] }
 
 [dev-dependencies]
 tokio = { version = "1.21.1", features = ["full"] }
-sqlx = {version = "0.7.4", features = ["runtime-tokio-rustls", "postgres"]}
 
 [features]
 serde = [

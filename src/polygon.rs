@@ -6,6 +6,7 @@ use geozero::ToWkb;
 #[cfg(feature = "sqlx")]
 use sqlx::{
     encode::IsNull,
+    error::BoxDynError,
     postgres::{PgHasArrayType, PgTypeInfo, PgValueRef},
     Postgres,
 };
@@ -82,7 +83,7 @@ impl TryFrom<Geometry> for Polygon {
 
 #[cfg(feature = "sqlx")]
 impl<'de> sqlx::Decode<'de, Postgres> for Polygon {
-    fn decode(value: PgValueRef<'de>) -> Result<Self, sqlx::error::BoxDynError> {
+    fn decode(value: PgValueRef<'de>) -> Result<Self, BoxDynError> {
         let geometry = Geometry::decode(value)?;
         let polygon = geo::Polygon::<f64>::try_from(geometry.0)?;
         Ok(Polygon(polygon))
@@ -91,12 +92,15 @@ impl<'de> sqlx::Decode<'de, Postgres> for Polygon {
 
 #[cfg(feature = "sqlx")]
 impl<'en> sqlx::Encode<'en, Postgres> for Polygon {
-    fn encode_by_ref(&self, buf: &mut sqlx::postgres::PgArgumentBuffer) -> IsNull {
+    fn encode_by_ref(
+        &self,
+        buf: &mut sqlx::postgres::PgArgumentBuffer,
+    ) -> Result<IsNull, BoxDynError> {
         let x = geo::Geometry::Polygon(self.0.clone())
             .to_ewkb(geozero::CoordDimensions::xy(), None)
             .unwrap();
         buf.extend(x);
-        sqlx::encode::IsNull::No
+        Ok(sqlx::encode::IsNull::No)
     }
 }
 
